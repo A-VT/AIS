@@ -9,7 +9,6 @@ lst_European_Union_countries = [ "Austria", "Belgium", "Bulgaria", "Croatia", "C
     "Finland", "France", "Germany", "Greece", "Hungary", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
     "Malta", "Netherlands", "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden"]
 
-lst_Code_EU_countries = [ "AUS" ]
 
 
 #####File Locations
@@ -24,8 +23,21 @@ file_locations = ["./data/WorldExpenditures.csv", "./data/world_development_indi
                   "./data/WHO statistics/dataAvailibilityForUhc.csv", "data/WHO statistics/dentists.csv",
                   "./data/WHO statistics/eliminateViolenceAgainstWomen.csv",
                   "./data/WHO statistics/HALElifeExpectancyAtBirth.csv",
-                  "./data/WHO statistics/HALeWHOregionLifeExpectancyAtBirth.csv"]
-
+                  "./data/WHO statistics/HALeWHOregionLifeExpectancyAtBirth.csv",
+                  "./data/WHO statistics/hepatitusBsurfaceAntigen.csv", "./data/WHO statistics/incedenceOfMalaria.csv",
+                  "./data/WHO statistics/incedenceOfTuberculosis.csv","./data/WHO statistics/infantMortalityRate.csv",
+                  "./data/WHO statistics/interventionAgianstNTDs.csv","./data/WHO statistics/lifeExpectancyAtBirth.csv",
+                  "./data/WHO statistics/maternalMortalityRatio.csv", "./data/WHO statistics/medicalDoctors.csv",
+                  "./data/WHO statistics/mortalityRatePoisoning.csv",
+                  "./data/WHO statistics/mortalityRateUnsafeWash.csv",
+                  "./data/WHO statistics/neonatalMortalityRate.csv", "./data/WHO statistics/newHivInfections.csv",
+                  "./data/WHO statistics/nursingAndMidwife.csv", "./data/WHO statistics/ofHaleInLifeExpectancy.csv",
+                  "./data/WHO statistics/pharmacists.csv", "./data/WHO statistics/population10SDG3.8.2.csv",
+                  "./data/WHO statistics/population25SDG3.8.2.csv", "./data/WHO statistics/reproductiveAgeWomen.csv",
+                  "./data/WHO statistics/roadTrafficDeaths.csv", "./data/WHO statistics/safelySanitization.csv",
+                  "./data/WHO statistics/tobaccoAge15.csv", "./data/WHO statistics/uhcCoverage.csv",
+                  "./data/WHO statistics/under5MortalityRate.csv",
+                  "./data/WHO statistics/WHOregionLifeExpectancyAtBirth.csv"]
 
 ## function to clean countries which are not in the European Union
 def filter_eu_countries(chunk, column_name):
@@ -49,7 +61,6 @@ def clean_and_leave_EU_coutries():
         # Concatenate filtered chunks and save the result
         filtered_df = pd.concat(filtered_chunks)
         filtered_df.to_csv(f"./clean/filtered_file_{i+1}.csv", index=False) # creation of files 
-
 
 def define_one_dataframe():
 
