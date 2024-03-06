@@ -113,7 +113,8 @@ def min_max_years(chunk):
 def main():
     start_time = time.time()
     lst_min_max_year = [None, None, []]
-    dfs = []
+    dfs_type1 = []
+    dfs_type2 = []
     for fll_i, fll in enumerate(file_locations):
         print(f"fll_i {fll_i} | fll {fll}")
         toReplace = ["Country", "Country Name", "Country Name", "Country"]
@@ -144,43 +145,57 @@ def main():
 
                 if "Dim1" in chunk.columns:
                     chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
-            
-            dfs.append(chunk)
+
+
+            if "Dimension" not in chunk.columns:
+                dfs_type1.append(chunk)
+            else:
+                dfs_type2.append(chunk)
             #print(f"chunk {i}")
             #print(chunk.head())
 
-    merged_df = dfs[0]
-    for index, df in enumerate(dfs[1:]):
-        merged_df["Period"] = merged_df["Period"].astype(str)
+    print("################ START ################")
+    merged_df_1 = dfs_type1[0]
+    for index, df in enumerate(dfs_type1[1:]):
+        print(df)
+        merged_df_1["Period"] = merged_df_1["Period"].astype(str)
         df["Period"] = df["Period"].astype(str)
         suffixes = (f'_{index}', '')
-        merged_df = pd.merge(merged_df, df, on=["Location", "Period"], how="outer", suffixes=suffixes)
+        merged_df_1 = pd.merge(merged_df_1, df, on=["Location", "Period"], how="outer") # suffixes=suffixes
+
+    print("################ Done appending type 1 dataframes. ################")
+
+    merged_df_2 = dfs_type2[0]
+    print(f"merged_df_2.columns {merged_df_2.columns}")
+    for index, df2 in enumerate(dfs_type2[1:]):
+        print(f"df2.columns {df2.columns}")
+        merged_df_2["Period"] = merged_df_2["Period"].astype(str)
+        df2["Period"] = df2["Period"].astype(str)
+        suffixes = (f'_{index}', '')
+        merged_df_2 = pd.merge(merged_df_2, df2, on=["Location", "Period", "Dimension"], how="outer") # suffixes=suffixes
+
+    print("################ DONE ################")
+
+    merged_df= pd.merge(merged_df_2, merged_df_1, on=["Location", "Period"], how="outer")
+    #print(merged_df.columns)
+    #print(merged_df.head())
 
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print("Time taken for code block 1:", elapsed_time, "seconds")
-    merged_df.to_csv("PANDAS.csv", index=False)
     
+    print("Time taken for code block 1:", elapsed_time, "seconds")
+    #merged_df.to_csv("PANDAS.csv", index=False)
+
     
     print(merged_df.columns)
     print(merged_df.head())
- #       df_long = pd.concat(chunk_list)
-    #print(df_long.head())
 
 
-
-
+    #####Pyspark dataframe
+    df_spark = spark.createDataFrame(merged_df)
+    df_spark.show(1)
 
 
 if __name__ == "__main__":
     main()
 
-#####Pyspark dataframe
-#df_expenditure = spark.createDataFrame(wExpenditure_panda_df)
-#df_devIndicators = spark.createDataFrame(wDev_indicators_panda_df)
-#df_inflation = spark.createDataFrame(wInflation_panda_df)
-
-#####Dataframe view
-#df_expenditure.show(1)
-#df_devIndicators.show(1)
-#df_inflation.show(1)
