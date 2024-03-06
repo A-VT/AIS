@@ -9,9 +9,9 @@ spark = SparkSession.builder.appName("demo").getOrCreate()
 file_locations = ["./data/WorldExpenditures.csv", "./data/world_development_indicators.csv" , 
                   "./data/world_development_indicators_1.csv" , "./data/Global_Inflation.csv",
                   "./data/WHO statistics/30-70cancerChdEtc.csv", "./data/WHO statistics/adolescentBirthRate.csv",
-                  "./data/WHO statistics/airPollutionDeathRate.py", "./data/WHO statistics/alcoholSubstanceAbuse.py",
-                  "./data/WHO statistics/atLeastBasicSanitizationServices.py",
-                  "./data/WHO statistics/basicDrinkingWaterServices.py", "./data/WHO statistics/basicHandWashing.csv",
+                  "./data/WHO statistics/airPollutionDeathRate.csv", "./data/WHO statistics/alcoholSubstanceAbuse.csv",
+                  "./data/WHO statistics/atLeastBasicSanitizationServices.csv",
+                  "./data/WHO statistics/basicDrinkingWaterServices.csv", "./data/WHO statistics/basicHandWashing.csv",
                   "./data/WHO statistics/birthAttendedBySkilledPersonal.csv",
                   "./data/WHO statistics/cleanFuelAndTech.csv", "data/WHO statistics/crudeSuicideRates.csv", 
                   "./data/WHO statistics/dataAvailibilityForUhc.csv", "data/WHO statistics/dentists.csv",
@@ -68,17 +68,22 @@ def process_chunk_by_year(chunk, first_year, last_year):
 
 
 def min_max_years(chunk):
-    years_columns = [col for col in chunk.columns if col.isdigit()]
+    #years_columns = [col for col in chunk.columns if col.isdigit()]
+    years_columns = []
+    for col in chunk.columns:
+        for char in col:
+            if char.isdigit() and col not in years_columns:
+                years_columns.append(col)
+    print([min(years_columns), max(years_columns)])
     return [min(years_columns), max(years_columns)]
 
 
 def main():
-    lst_min_max_year = []
-
+    lst_min_max_year = [0,0]
     for fll_i, fll in enumerate(file_locations):
         chunk_list = []
-        for i, chunk in enumerate(pd.read_csv(fll_i, chunksize=10000, encoding='latin1')): #file_locations[3]
-            if i==0:
+        for i, chunk in enumerate(pd.read_csv(fll, chunksize=5000, encoding='latin1')): #file_locations[3]
+            if fll_i==1 or fll_i==2 or fll_i==3:
                 lst_min_max_year = min_max_years(chunk)
             chunk_processed = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]))
             chunk_list.append(chunk_processed)
