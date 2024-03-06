@@ -131,15 +131,17 @@ def main():
                 chunk = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2], value_column_name[fll_i-1])
                 chunk.rename(columns={"Year": "Period"}, inplace=True)
 
-            
+            #process WHO files
             if fll_i>3:
-                newName = chunk.loc[0, "Indicator"]
-                print(f"newName {newName}")
-                chunk.rename(columns={"First Tooltip": newName}, inplace=True)
-                chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
-                chunk.drop(columns=['Indicator'], inplace=True)
+                print(chunk.columns)
+                if("First Tooltip" in chunk.columns and "Dim1" in chunk.columns):
+                    newName = chunk.loc[0, "Indicator"]
+                    chunk.rename(columns={"First Tooltip": newName}, inplace=True)
+                    chunk.drop(columns=['Indicator'], inplace=True)
+                if("Dim1" in chunk.columns):
+                    chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
 
-            #print(chunk.columns)
+            print(f"chunk {i}")
             print(chunk.head())
             chunk_list.append(chunk)
 
