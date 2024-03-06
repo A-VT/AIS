@@ -6,32 +6,51 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName("demo").getOrCreate()
 
 #####File Locations
-file_locations = ["./data/WorldExpenditures.csv", "./data/world_development_indicators.csv" , 
-                  "./data/world_development_indicators_1.csv" , "./data/Global_Inflation.csv",
-                  "./data/WHO statistics/30-70cancerChdEtc.csv", "./data/WHO statistics/adolescentBirthRate.csv",
-                  "./data/WHO statistics/airPollutionDeathRate.csv", "./data/WHO statistics/alcoholSubstanceAbuse.csv",
-                  "./data/WHO statistics/atLeastBasicSanitizationServices.csv",
-                  "./data/WHO statistics/basicDrinkingWaterServices.csv", "./data/WHO statistics/basicHandWashing.csv",
-                  "./data/WHO statistics/birthAttendedBySkilledPersonal.csv",
-                  "./data/WHO statistics/cleanFuelAndTech.csv", "data/WHO statistics/crudeSuicideRates.csv", 
-                  "./data/WHO statistics/dataAvailibilityForUhc.csv", "data/WHO statistics/dentists.csv",
-                  "./data/WHO statistics/eliminateViolenceAgainstWomen.csv",
-                  "./data/WHO statistics/HALElifeExpectancyAtBirth.csv",
-                  "./data/WHO statistics/HALeWHOregionLifeExpectancyAtBirth.csv",
-                  "./data/WHO statistics/hepatitusBsurfaceAntigen.csv", "./data/WHO statistics/incedenceOfMalaria.csv",
-                  "./data/WHO statistics/incedenceOfTuberculosis.csv","./data/WHO statistics/infantMortalityRate.csv",
-                  "./data/WHO statistics/interventionAgianstNTDs.csv","./data/WHO statistics/lifeExpectancyAtBirth.csv",
-                  "./data/WHO statistics/maternalMortalityRatio.csv", "./data/WHO statistics/medicalDoctors.csv",
-                  "./data/WHO statistics/mortalityRatePoisoning.csv",
-                  "./data/WHO statistics/mortalityRateUnsafeWash.csv",
-                  "./data/WHO statistics/neonatalMortalityRate.csv", "./data/WHO statistics/newHivInfections.csv",
-                  "./data/WHO statistics/nursingAndMidwife.csv", "./data/WHO statistics/ofHaleInLifeExpectancy.csv",
-                  "./data/WHO statistics/pharmacists.csv", "./data/WHO statistics/population10SDG3.8.2.csv",
-                  "./data/WHO statistics/population25SDG3.8.2.csv", "./data/WHO statistics/reproductiveAgeWomen.csv",
-                  "./data/WHO statistics/roadTrafficDeaths.csv", "./data/WHO statistics/safelySanitization.csv",
-                  "./data/WHO statistics/tobaccoAge15.csv", "./data/WHO statistics/uhcCoverage.csv",
-                  "./data/WHO statistics/under5MortalityRate.csv",
-                  "./data/WHO statistics/WHOregionLifeExpectancyAtBirth.csv"]
+file_locations = [
+    "./data/WorldExpenditures.csv", 
+    "./data/world_development_indicators.csv",
+    "./data/world_development_indicators_1.csv",
+    "./data/Global_Inflation.csv",
+    "./data/WHO_statistics/30-70cancerChdEtc.csv",
+    "./data/WHO_statistics/adolescentBirthRate.csv",
+    "./data/WHO_statistics/airPollutionDeathRate.csv",
+    "./data/WHO_statistics/alcoholSubstanceAbuse.csv",
+    "./data/WHO_statistics/atLeastBasicSanitizationServices.csv",
+    "./data/WHO_statistics/basicDrinkingWaterServices.csv",
+    "./data/WHO_statistics/basicHandWashing.csv",
+    "./data/WHO_statistics/birthAttendedBySkilledPersonal.csv",
+    "./data/WHO_statistics/cleanFuelAndTech.csv",
+    "./data/WHO_statistics/crudeSuicideRates.csv",
+    "./data/WHO_statistics/dataAvailibilityForUhc.csv",
+    "./data/WHO_statistics/dentists.csv",
+    "./data/WHO_statistics/eliminateViolenceAgainstWomen.csv",
+    "./data/WHO_statistics/HALElifeExpectancyAtBirth.csv",
+    "./data/WHO_statistics/HALeWHOregionLifeExpectancyAtBirth.csv",
+    "./data/WHO_statistics/hepatitusBsurfaceAntigen.csv",
+    "./data/WHO_statistics/incedenceOfMalaria.csv",
+    "./data/WHO_statistics/incedenceOfTuberculosis.csv",
+    "./data/WHO_statistics/infantMortalityRate.csv",
+    "./data/WHO_statistics/interventionAgianstNTDs.csv",
+    "./data/WHO_statistics/lifeExpectancyAtBirth.csv",
+    "./data/WHO_statistics/maternalMortalityRatio.csv",
+    "./data/WHO_statistics/medicalDoctors.csv",
+    "./data/WHO_statistics/mortalityRatePoisoning.csv",
+    "./data/WHO_statistics/mortalityRateUnsafeWash.csv",
+    "./data/WHO_statistics/neonatalMortalityRate.csv",
+    "./data/WHO_statistics/newHivInfections.csv",
+    "./data/WHO_statistics/nursingAndMidwife.csv",
+    "./data/WHO_statistics/ofHaleInLifeExpectancy.csv",
+    "./data/WHO_statistics/pharmacists.csv",
+    "./data/WHO_statistics/population10SDG3.8.2.csv",
+    "./data/WHO_statistics/population25SDG3.8.2.csv",
+    "./data/WHO_statistics/reproductiveAgeWomen.csv",
+    "./data/WHO_statistics/roadTrafficDeaths.csv",
+    "./data/WHO_statistics/safelySanitization.csv",
+    "./data/WHO_statistics/tobaccoAge15.csv",
+    "./data/WHO_statistics/uhcCoverage.csv",
+    "./data/WHO_statistics/under5MortalityRate.csv",
+    "./data/WHO_statistics/WHOregionLifeExpectancyAtBirth.csv"
+]
 
 ## function to clean countries which are not in the European Union
 def filter_eu_countries(chunk, column_name):
@@ -102,11 +121,10 @@ def main():
             #process year columns
             if fll_i==1 or fll_i==2 or fll_i==3:
                 lst_min_max_year = min_max_years(chunk)
-                #print(f"{fll} {lst_min_max_year}")
                 chunk_processed = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2])
                 chunk_list.append(chunk_processed)
 
-    #    df_long = pd.concat(chunk_list)
+ #       df_long = pd.concat(chunk_list)
     #print(df_long.head())
 
 
