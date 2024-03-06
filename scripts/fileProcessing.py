@@ -111,7 +111,7 @@ def min_max_years(chunk):
 
 
 def main():
-    start_time = time.time()
+    time1 = time.time()
     lst_min_max_year = [None, None, []]
     dfs_type1 = []
     dfs_type2 = []
@@ -154,6 +154,7 @@ def main():
             #print(f"chunk {i}")
             #print(chunk.head())
 
+    time2 = time.time()
     print("################ START ################")
     merged_df_1 = dfs_type1[0]
     for index, df in enumerate(dfs_type1[1:]):
@@ -174,25 +175,26 @@ def main():
         suffixes = (f'_{index}', '')
         merged_df_2 = pd.merge(merged_df_2, df2, on=["Location", "Period", "Dimension"], how="outer") # suffixes=suffixes
 
-    print("################ DONE ################")
+    print("################ Done appending type 2 dataframes. ################")
 
     merged_df= pd.merge(merged_df_2, merged_df_1, on=["Location", "Period"], how="outer")
-    #print(merged_df.columns)
-    #print(merged_df.head())
-
-    end_time = time.time()
-    elapsed_time = end_time - start_time
+    print("################ DONE ################")
+    time3 = time.time()
     
-    print("Time taken for code block 1:", elapsed_time, "seconds")
+    elapsed_time = time3 - time2
+    
+    print("Time taken for merging all files:", elapsed_time, "seconds")
     #merged_df.to_csv("PANDAS.csv", index=False)
 
-    
     print(merged_df.columns)
-    print(merged_df.head())
 
 
     #####Pyspark dataframe
+    time4 = time.time()
     df_spark = spark.createDataFrame(merged_df)
+    time5 = time.time()
+    elapsed_time2 = time4 - time5
+    print("Time taken for convert from panda to sparkl dataframe:", elapsed_time2, "seconds")
     df_spark.show(1)
 
 
