@@ -60,38 +60,51 @@ def clean_and_leave_EU_coutries():
         filtered_df.to_csv(f"./clean/filtered_file_{i+1}.csv", index=False) # creation of files 
 
 
-def process_chunk_by_year(chunk, first_year, last_year):
+def process_chunk_by_year(chunk, first_year, last_year, cols):
     years_columns = [str(year) for year in range(first_year, last_year)]
-    chunk_long = pd.melt(chunk, id_vars=["Country Code","IMF Country Code","Country","Indicator Type","Series Name", "Note"], 
+    chunk_long = pd.melt(chunk, id_vars=cols , 
                          value_vars=years_columns, var_name="Year", value_name="Value")
     return chunk_long
 
 
 def min_max_years(chunk):
-    #years_columns = [col for col in chunk.columns if col.isdigit()]
-    years_columns = []
-    for col in chunk.columns:
-        for char in col:
-            if char.isdigit() and col not in years_columns:
-                years_columns.append(col)
-    print([min(years_columns), max(years_columns)])
-    return [min(years_columns), max(years_columns)]
+    years_columns, other_columns = [], []
+    result = []
+    print(chunk.columns)
+
+    #for col in chunk.columns:
+    #    colIsYear = False
+    #    for char in col:
+    #        if char.isdigit() and col not in years_columns and "Unnamed" not in col:
+    #            cleanCol = col.split(' ')[0]
+    #            years_columns.append(col)
+    #            colIsYear = True
+#
+    #    if colIsYear == False:
+    #        other_columns.append(col)
+#
+    #chunk.rename(columns={col: col.split(' ')[0] for col in years_columns}, inplace=True)
+    #if years_columns != []:
+    #    result = [min(years_columns), max(years_columns), other_columns]
+    #else:
+    #    result = [None, None,other_columns]
+    return result
 
 
 def main():
-    lst_min_max_year = [0,0]
+    lst_min_max_year = [None, None, []]
     for fll_i, fll in enumerate(file_locations):
+        #process the year columns
         chunk_list = []
-        for i, chunk in enumerate(pd.read_csv(fll, chunksize=5000, encoding='latin1')): #file_locations[3]
+        for i, chunk in enumerate(pd.read_csv(fll, chunksize=10000, encoding='latin1')): #file_locations[3]
             if fll_i==1 or fll_i==2 or fll_i==3:
                 lst_min_max_year = min_max_years(chunk)
-            chunk_processed = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]))
-            chunk_list.append(chunk_processed)
-        df_long = pd.concat(chunk_list)
+                #print(f"{fll} {lst_min_max_year}")
+                #chunk_processed = process_chunk_by_year(chunk, lst_min_max_year[0], lst_min_max_year[1], lst_min_max_year[2])
+                #chunk_list.append(chunk_processed)
 
-
-
-    print(df_long.head())
+#        df_long = pd.concat(chunk_list)
+#    print(df_long.head())
 
 
 
