@@ -133,16 +133,18 @@ def main():
 
             #process WHO files
             if fll_i>3:
-                if("First Tooltip" in chunk.columns and "Indicator" in chunk.columns):
+                if "First Tooltip" in chunk.columns and "Indicator" in chunk.columns:
                     print("First Tooltip in the columns")
-
-                    newName = chunk.loc[0, "Indicator"]
-
-                    chunk.rename(columns={"First Tooltip": newName}, inplace=True)
+                    print("Columns:", chunk.columns)
+                    new_column_name = chunk.iloc[0]["Indicator"]
+                    chunk.rename(columns={"First Tooltip": new_column_name}, inplace=True)
                     chunk.drop(columns=['Indicator'], inplace=True)
-                if("Dim1" in chunk.columns):
+                    
+                if "Dim1" in chunk.columns:
                     chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
 
+
+            
             print(f"chunk {i}")
             print(chunk.head())
             chunk_list.append(chunk)
