@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 from pyspark.sql import SparkSession
+import time
 
 
 spark = SparkSession.builder.appName("demo").getOrCreate()
@@ -110,6 +111,7 @@ def min_max_years(chunk):
 
 
 def main():
+    start_time = time.time()
     lst_min_max_year = [None, None, []]
     dfs = []
     for fll_i, fll in enumerate(file_locations):
@@ -133,6 +135,8 @@ def main():
 
             #process WHO files
             if fll_i>3:
+                if "ï»¿Location" in chunk.columns:
+                    chunk.rename(columns={'ï»¿Location': 'Location'}, inplace=True)
                 if "First Tooltip" in chunk.columns and "Indicator" in chunk.columns:
                     new_column_name = chunk.iloc[0]["Indicator"]
                     chunk.rename(columns={"First Tooltip": new_column_name}, inplace=True)
@@ -146,11 +150,16 @@ def main():
             #print(chunk.head())
 
     merged_df = dfs[0]
-    for df in dfs[1:]:
-        # Convert "Period" column to string data type
+    for index, df in enumerate(dfs[1:]):
         merged_df["Period"] = merged_df["Period"].astype(str)
         df["Period"] = df["Period"].astype(str)
-        merged_df = pd.merge(merged_df, df, on=["Location", "Period"], how="outer")
+        suffixes = (f'_{index}', '')
+        merged_df = pd.merge(merged_df, df, on=["Location", "Period"], how="outer", suffixes=suffixes)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print("Time taken for code block 1:", elapsed_time, "seconds")
+    merged_df.to_csv("PANDAS.csv", index=False)
     
     
     print(merged_df.columns)
