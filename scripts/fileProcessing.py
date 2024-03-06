@@ -11,6 +11,7 @@ file_locations = [
     "./data/world_development_indicators.csv",
     "./data/world_development_indicators_1.csv",
     "./data/Global_Inflation.csv",
+
     "./data/WHO_statistics/30-70cancerChdEtc.csv",
     "./data/WHO_statistics/adolescentBirthRate.csv",
     "./data/WHO_statistics/airPollutionDeathRate.csv",
@@ -82,16 +83,12 @@ def clean_and_leave_EU_coutries():
 def process_chunk_by_year(chunk, first_year, last_year, cols, newColName):
     years_columns = [str(year) for year in range(first_year, last_year + 1)]
     cols_to_melt = [col for col in chunk.columns if any(year in col.split(' ')[0] for year in years_columns)]
-    #print(f"chunk.columns {chunk.columns}")
-    #print(f"years_columns {years_columns}")
     if not cols_to_melt:
         print("No year columns found in the chunk.")
         return None
     
     id_vars = [col for col in chunk.columns if col not in cols_to_melt]
     melted_chunk = pd.melt(chunk, id_vars=id_vars, value_vars=cols_to_melt, var_name="Year", value_name=newColName)
-    print(melted_chunk.columns)
-    print(melted_chunk.head())
     return melted_chunk
 
 
@@ -115,19 +112,36 @@ def min_max_years(chunk):
 def main():
     lst_min_max_year = [None, None, []]
     for fll_i, fll in enumerate(file_locations):
-        print(f"fll_i {fll_i}")
+        print(f"fll_i {fll_i} | fll {fll}")
         chunk_list = []
-        default_location_column_name, colName = "CountryName" , ""
-
+        toReplace = ["Country", "Country Name", "Country Name", "Country"]
+        toReplace2 = ["Country", "Country Name", "Country Name", "Country"]
         for i, chunk in enumerate(pd.read_csv(fll, chunksize=10000, encoding='latin1')): #file_locations[3]
+            
+            # process "location column"
+            if fll_i <= 3:
+                chunk.rename(columns={toReplace[fll_i]: "Location"}, inplace=True)
 
             #process year columns
+            if fll_i == 0:
+                chunk.rename(columns={"Year": "Period"}, inplace=True)
             if fll_i==1 or fll_i==2 or fll_i==3:
                 value_column_name = ["Series Name Value", "Series Name Value", "Inflation Value" ]
                 lst_min_max_year = min_max_years(chunk)
-                #print(f"lst_min_max_year {lst_min_max_year}")
-                chunk_processed = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2], value_column_name[fll_i-1])
-                chunk_list.append(chunk_processed)
+                chunk = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2], value_column_name[fll_i-1])
+                chunk.rename(columns={"Year": "Period"}, inplace=True)
+
+            
+            if fll_i>3:
+                newName = chunk.loc[0, "Indicator"]
+                print(f"newName {newName}")
+                chunk.rename(columns={"First Tooltip": newName}, inplace=True)
+                chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
+                chunk.drop(columns=['Indicator'], inplace=True)
+
+            #print(chunk.columns)
+            print(chunk.head())
+            chunk_list.append(chunk)
 
  #       df_long = pd.concat(chunk_list)
     #print(df_long.head())
