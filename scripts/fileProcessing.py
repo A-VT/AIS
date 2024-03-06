@@ -61,12 +61,16 @@ def clean_and_leave_EU_coutries():
 
 
 def process_chunk_by_year(chunk, first_year, last_year, cols):
-    print(chunk.columns)
-    years_columns = [str(year) for year in range(first_year, last_year)]
-    print(years_columns)
-    #chunk_long = pd.melt(chunk, id_vars=cols , 
-    #                     value_vars=years_columns, var_name="Year", value_name="Value")
-    #return chunk_long
+    years_columns = [str(year) for year in range(first_year, last_year + 1)]
+    cols_to_melt = [col for col in years_columns if col in chunk.columns]
+    if not cols_to_melt:
+        #print("No year columns found in the chunk.")
+        return None
+    
+    id_vars = [col for col in chunk.columns if col not in cols_to_melt]
+    melted_chunk = pd.melt(chunk, id_vars=id_vars, value_vars=cols_to_melt, var_name="Year", value_name="Value")
+    print(melted_chunk.columns)
+    return melted_chunk
 
 
 def min_max_years(chunk):
@@ -100,10 +104,10 @@ def main():
                 lst_min_max_year = min_max_years(chunk)
                 #print(f"{fll} {lst_min_max_year}")
                 chunk_processed = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2])
-                #hunk_list.append(chunk_processed)
+                chunk_list.append(chunk_processed)
 
-#        df_long = pd.concat(chunk_list)
-#    print(df_long.head())
+    #    df_long = pd.concat(chunk_list)
+    #print(df_long.head())
 
 
 
