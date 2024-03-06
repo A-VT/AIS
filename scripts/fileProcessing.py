@@ -115,7 +115,7 @@ def main():
         print(f"fll_i {fll_i} | fll {fll}")
         chunk_list = []
         toReplace = ["Country", "Country Name", "Country Name", "Country"]
-        toReplace2 = ["Country", "Country Name", "Country Name", "Country"]
+
         for i, chunk in enumerate(pd.read_csv(fll, chunksize=10000, encoding='latin1')): #file_locations[3]
             
             # process "location column"
@@ -133,9 +133,11 @@ def main():
 
             #process WHO files
             if fll_i>3:
-                print(chunk.columns)
-                if("First Tooltip" in chunk.columns and "Dim1" in chunk.columns):
+                if("First Tooltip" in chunk.columns and "Indicator" in chunk.columns):
+                    print("First Tooltip in the columns")
+
                     newName = chunk.loc[0, "Indicator"]
+
                     chunk.rename(columns={"First Tooltip": newName}, inplace=True)
                     chunk.drop(columns=['Indicator'], inplace=True)
                 if("Dim1" in chunk.columns):
