@@ -111,9 +111,9 @@ def min_max_years(chunk):
 
 def main():
     lst_min_max_year = [None, None, []]
+    dfs = []
     for fll_i, fll in enumerate(file_locations):
         print(f"fll_i {fll_i} | fll {fll}")
-        chunk_list = []
         toReplace = ["Country", "Country Name", "Country Name", "Country"]
 
         for i, chunk in enumerate(pd.read_csv(fll, chunksize=10000, encoding='latin1')): #file_locations[3]
@@ -122,7 +122,7 @@ def main():
             if fll_i <= 3:
                 chunk.rename(columns={toReplace[fll_i]: "Location"}, inplace=True)
 
-            #process year columns
+            #process year-ranging columns
             if fll_i == 0:
                 chunk.rename(columns={"Year": "Period"}, inplace=True)
             if fll_i==1 or fll_i==2 or fll_i==3:
@@ -134,21 +134,27 @@ def main():
             #process WHO files
             if fll_i>3:
                 if "First Tooltip" in chunk.columns and "Indicator" in chunk.columns:
-                    print("First Tooltip in the columns")
-                    print("Columns:", chunk.columns)
                     new_column_name = chunk.iloc[0]["Indicator"]
                     chunk.rename(columns={"First Tooltip": new_column_name}, inplace=True)
                     chunk.drop(columns=['Indicator'], inplace=True)
-                    
+
                 if "Dim1" in chunk.columns:
                     chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
-
-
             
-            print(f"chunk {i}")
-            print(chunk.head())
-            chunk_list.append(chunk)
+            dfs.append(chunk)
+            #print(f"chunk {i}")
+            #print(chunk.head())
 
+    merged_df = dfs[0]
+    for df in dfs[1:]:
+        # Convert "Period" column to string data type
+        merged_df["Period"] = merged_df["Period"].astype(str)
+        df["Period"] = df["Period"].astype(str)
+        merged_df = pd.merge(merged_df, df, on=["Location", "Period"], how="outer")
+    
+    
+    print(merged_df.columns)
+    print(merged_df.head())
  #       df_long = pd.concat(chunk_list)
     #print(df_long.head())
 
