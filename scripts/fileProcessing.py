@@ -4,15 +4,13 @@ from pyspark.sql import SparkSession
 import time
 
 
-spark = SparkSession.builder.appName("demo").getOrCreate()
+spark = SparkSession.builder.appName("demo").config("spark.driver.memory", "8g").config("spark.executor.memory", "8g").getOrCreate()
 
 #####File Locations
 file_locations = [
     "./data/WorldExpenditures.csv", 
-    "./data/world_development_indicators.csv",
-    "./data/world_development_indicators_1.csv",
+    "./data/combined_world_development.csv",
     "./data/Global_Inflation.csv",
-
     "./data/WHO_statistics/30-70cancerChdEtc.csv",
     "./data/WHO_statistics/adolescentBirthRate.csv",
     "./data/WHO_statistics/airPollutionDeathRate.csv",
@@ -89,7 +87,7 @@ def process_chunk_by_year(chunk, first_year, last_year, cols, newColName):
         return None
     
     id_vars = [col for col in chunk.columns if col not in cols_to_melt]
-    melted_chunk = pd.melt(chunk, id_vars=id_vars, value_vars=cols_to_melt, var_name="Year", value_name=newColName)
+    melted_chunk = pd.melt(chunk, id_vars=id_vars, value_vars=cols_to_melt, var_name="Period", value_name=newColName)
     return melted_chunk
 
 
@@ -113,29 +111,31 @@ def min_max_years(chunk):
 def main():
     time1 = time.time()
     lst_min_max_year = [None, None, []]
-    dfs_type1 = []
-    dfs_type2 = []
+    dfs_type1 = {}
+    dfs_type2 = {}
+
     for fll_i, fll in enumerate(file_locations):
         print(f"fll_i {fll_i} | fll {fll}")
-        toReplace = ["Country", "Country Name", "Country Name", "Country"]
+        toReplace = ["Country", "Country Name", "Country"]
+        lst_chunks_per_file = []
 
         for i, chunk in enumerate(pd.read_csv(fll, chunksize=10000, encoding='latin1')): #file_locations[3]
             
             # process "location column"
-            if fll_i <= 3:
+            if fll_i <= 2:
                 chunk.rename(columns={toReplace[fll_i]: "Location"}, inplace=True)
 
             #process year-ranging columns
             if fll_i == 0:
                 chunk.rename(columns={"Year": "Period"}, inplace=True)
-            if fll_i==1 or fll_i==2 or fll_i==3:
-                value_column_name = ["Series Name Value", "Series Name Value", "Inflation Value" ]
+            if fll_i==1 or fll_i==2:
+                value_column_name = ["Series Name Value", "Inflation Value" ]
                 lst_min_max_year = min_max_years(chunk)
                 chunk = process_chunk_by_year(chunk, int(lst_min_max_year[0]), int(lst_min_max_year[1]), lst_min_max_year[2], value_column_name[fll_i-1])
-                chunk.rename(columns={"Year": "Period"}, inplace=True)
+                #chunk.rename(columns={"Year": "Period"}, inplace=True)
 
             #process WHO files
-            if fll_i>3:
+            if fll_i>2:
                 if "ï»¿Location" in chunk.columns:
                     chunk.rename(columns={'ï»¿Location': 'Location'}, inplace=True)
                 if "First Tooltip" in chunk.columns and "Indicator" in chunk.columns:
@@ -146,35 +146,76 @@ def main():
                 if "Dim1" in chunk.columns:
                     chunk.rename(columns={"Dim1": "Dimension"}, inplace=True)
 
+            lst_chunks_per_file.append(chunk)
 
             if "Dimension" not in chunk.columns:
-                dfs_type1.append(chunk)
+                print(chunk.columns)
+                if fll_i not in dfs_type1:
+                    dfs_type1[fll_i] = [chunk]
+                else:
+                    dfs_type1[fll_i].append(chunk)
             else:
-                dfs_type2.append(chunk)
+                if fll_i not in dfs_type2:
+                    dfs_type2[fll_i] = [chunk]
+                else:
+                    dfs_type2[fll_i].append(chunk)
+
             #print(f"chunk {i}")
             #print(chunk.head())
 
     time2 = time.time()
-    print("################ START ################")
-    merged_df_1 = dfs_type1[0]
-    for index, df in enumerate(dfs_type1[1:]):
-        print(df)
-        merged_df_1["Period"] = merged_df_1["Period"].astype(str)
-        df["Period"] = df["Period"].astype(str)
-        suffixes = (f'_{index}', '')
-        merged_df_1 = pd.merge(merged_df_1, df, on=["Location", "Period"], how="outer") # suffixes=suffixes
 
+    print("################ START ################")
+    '''
+    #merged_df_1 = dfs_type1[0]
+    merged_df_1 = []
+    for fll_i, chunk in enumerate(dfs_type1):
+        for index, c in enumerate(chunk):
+            if index == 0:
+                df = c
+            else:
+                df = df.append(c, ignore_index=True)
+        merged_df_1 = df
+    '''
+
+    #merged_df_1 = dfs_type1[0]
+    for indexfile, df in enumerate(dfs_type1.items(), start=1):
+        print(f"\n df \n {df}")
+        print(type(df))
+        i = 0
+        for chunky in df:
+            print(f"\n chunky \n {chunky}")
+            if indexfile == 0 and i == 0:
+                merged_df_1 = chunky
+            else:
+                chunky["Period"] = chunky["Period"].astype(str)
+                chunky["Period"] = chunky["Period"].astype(str) #suffixes = (f'_{index}', '')
+                merged_df_1 = pd.merge(merged_df_1, df, on=["Location", "Period"], how="outer") # suffixes=suffixes
+            i+= 1
+
+    print(f"merged_df_1 {merged_df_1.columns}")
     print("################ Done appending type 1 dataframes. ################")
+    '''
+    merged_df_2 = []
+    for fll_i, chunk in dfs_type2:
+        for index, c in enumerate(chunk):
+            if index == 0:
+                df = c
+            else:
+                df = df.append(c, ignore_index=True)
+        merged_df_2 = df
+    '''
 
     merged_df_2 = dfs_type2[0]
-    print(f"merged_df_2.columns {merged_df_2.columns}")
-    for index, df2 in enumerate(dfs_type2[1:]):
-        print(f"df2.columns {df2.columns}")
+    #print(f"merged_df_2.columns {merged_df_2.columns}")
+    for index, df2 in enumerate(dfs_type2[1:], start=1):
+        #print(f"df2.columns {df2.columns}")
         merged_df_2["Period"] = merged_df_2["Period"].astype(str)
         df2["Period"] = df2["Period"].astype(str)
         suffixes = (f'_{index}', '')
         merged_df_2 = pd.merge(merged_df_2, df2, on=["Location", "Period", "Dimension"], how="outer") # suffixes=suffixes
 
+    print(f"merged_df_2 {merged_df_2.columns}")
     print("################ Done appending type 2 dataframes. ################")
 
     merged_df= pd.merge(merged_df_2, merged_df_1, on=["Location", "Period"], how="outer")
@@ -185,17 +226,17 @@ def main():
     
     print("Time taken for merging all files:", elapsed_time, "seconds")
     #merged_df.to_csv("PANDAS.csv", index=False)
+    #print(merged_df.columns)
 
-    print(merged_df.columns)
 
-
-    #####Pyspark dataframe
-    time4 = time.time()
-    df_spark = spark.createDataFrame(merged_df)
-    time5 = time.time()
-    elapsed_time2 = time4 - time5
-    print("Time taken for convert from panda to sparkl dataframe:", elapsed_time2, "seconds")
-    df_spark.show(1)
+    ######Pyspark dataframe
+    #time4 = time.time()
+    #sparkDF = spark.createDataFrame(merged_df)
+    #sparkDF.printSchema()
+    #time5 = time.time()
+    #elapsed_time2 = time4 - time5
+    #print("Time taken for convert from panda to sparkl dataframe:", elapsed_time2, "seconds")
+    #sparkDF.show(1)
 
 
 if __name__ == "__main__":
