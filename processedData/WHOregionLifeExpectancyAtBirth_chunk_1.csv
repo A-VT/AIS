@@ -1,0 +1,73 @@
+Location,Period,Dimension,Life expectancy at birth (years)
+Africa,2019,Both sexes,64.49
+Africa,2019,Male,62.37
+Africa,2019,Female,66.65
+Africa,2015,Both sexes,62.56
+Africa,2015,Male,60.47
+Africa,2015,Female,64.69
+Africa,2010,Both sexes,59.49
+Africa,2010,Male,57.69
+Africa,2010,Female,61.31
+Africa,2000,Both sexes,52.65
+Africa,2000,Male,51.06
+Africa,2000,Female,54.31
+Americas,2019,Both sexes,77.16
+Americas,2019,Male,74.49
+Americas,2019,Female,79.84
+Americas,2015,Both sexes,76.78
+Americas,2015,Male,74.05
+Americas,2015,Female,79.52
+Americas,2010,Both sexes,75.44
+Americas,2010,Male,72.53
+Americas,2010,Female,78.35
+Americas,2000,Both sexes,74.12
+Americas,2000,Male,71.13
+Americas,2000,Female,77.1
+South-East Asia,2019,Both sexes,71.44
+South-East Asia,2019,Male,69.88
+South-East Asia,2019,Female,73.1
+South-East Asia,2015,Both sexes,70.2
+South-East Asia,2015,Male,68.7
+South-East Asia,2015,Female,71.78
+South-East Asia,2010,Both sexes,68.11
+South-East Asia,2010,Male,66.39
+South-East Asia,2010,Female,69.99
+South-East Asia,2000,Both sexes,63.35
+South-East Asia,2000,Male,62.2
+South-East Asia,2000,Female,64.58
+Europe,2019,Both sexes,78.24
+Europe,2019,Male,75.09
+Europe,2019,Female,81.29
+Europe,2015,Both sexes,77.09
+Europe,2015,Male,73.8
+Europe,2015,Female,80.31
+Europe,2010,Both sexes,75.72
+Europe,2010,Male,72.14
+Europe,2010,Female,79.27
+Europe,2000,Both sexes,72.51
+Europe,2000,Male,68.44
+Europe,2000,Female,76.64
+Eastern Mediterranean,2019,Both sexes,69.74
+Eastern Mediterranean,2019,Male,68.31
+Eastern Mediterranean,2019,Female,71.31
+Eastern Mediterranean,2015,Both sexes,68.39
+Eastern Mediterranean,2015,Male,66.81
+Eastern Mediterranean,2015,Female,70.14
+Eastern Mediterranean,2010,Both sexes,67.58
+Eastern Mediterranean,2010,Male,66.03
+Eastern Mediterranean,2010,Female,69.27
+Eastern Mediterranean,2000,Both sexes,65.02
+Eastern Mediterranean,2000,Male,63.52
+Eastern Mediterranean,2000,Female,66.67
+Western Pacific,2019,Both sexes,77.66
+Western Pacific,2019,Male,74.76
+Western Pacific,2019,Female,80.83
+Western Pacific,2015,Both sexes,76.98
+Western Pacific,2015,Male,73.96
+Western Pacific,2015,Female,80.32
+Western Pacific,2010,Both sexes,75.46
+Western Pacific,2010,Male,72.52
+Western Pacific,2010,Female,78.75
+Western Pacific,2000,Both sexes,72.42
+Western Pacific,2000,Male,69.8
+Western Pacific,2000,Female,75.33

@@ -114,6 +114,8 @@ def main():
     dfs_type1 = {}
     dfs_type2 = {}
 
+    outfilepath="./processedData/"
+
     for fll_i, fll in enumerate(file_locations):
         print(f"fll_i {fll_i} | fll {fll}")
         toReplace = ["Country", "Country Name", "Country"]
@@ -148,6 +150,7 @@ def main():
 
             lst_chunks_per_file.append(chunk)
 
+
             if "Dimension" not in chunk.columns:
                 print(chunk.columns)
                 if fll_i not in dfs_type1:
@@ -162,7 +165,9 @@ def main():
 
             #print(f"chunk {i}")
             #print(chunk.head())
+                    
 
+    '''
     time2 = time.time()
 
     print("################ START ################")
@@ -177,14 +182,13 @@ def main():
                 merged_df_1 = df_temp.copy()
             else:
                 print(f" indexchunk {chunk}")
-                chunk["Period"] = chunk["Period"].astype(str)
-                chunk["Period"] = chunk["Period"].astype(str) #suffixes = (f'_{index}', '')
+                #chunk["Period"] = chunk["Period"].astype(str)
+                #chunk["Period"] = chunk["Period"].astype(str) #suffixes = (f'_{index}', '')
                 print(f"merged_df_1 {merged_df_1}| df_temp {df_temp} ")
                 merged_df_1 = pd.merge(merged_df_1, df_temp, on=["Location", "Period"], how="outer") # suffixes=suffixes
 
     print(f"merged_df_1 {merged_df_1.columns}")
     print("################ Done appending type 1 dataframes. ################")
-    '''
     merged_df_2 = []
     for fll_i, chunk in dfs_type2:
         for index, c in enumerate(chunk):
@@ -194,7 +198,7 @@ def main():
                 df = df.append(c, ignore_index=True)
         merged_df_2 = df
     '''
-
+    '''
     merged_df_2 = dfs_type2[0]
     #print(f"merged_df_2.columns {merged_df_2.columns}")
     for index, df2 in enumerate(dfs_type2[1:], start=1):
@@ -203,6 +207,21 @@ def main():
         df2["Period"] = df2["Period"].astype(str)
         suffixes = (f'_{index}', '')
         merged_df_2 = pd.merge(merged_df_2, df2, on=["Location", "Period", "Dimension"], how="outer") # suffixes=suffixes
+    '''
+
+    for indexfile, df in dfs_type2.items():
+        print(f"\n df \n {df}")
+        for indexchunk, chunk in enumerate(df):
+            chunk["Period"] = chunk["Period"].astype(str)
+            df_temp = pd.DataFrame(chunk)
+
+            print(f"\n chunky \n {chunk}")
+            if indexfile == 0 and indexchunk == 0:
+                merged_df_2 = df_temp.copy()
+            else:
+                print(f" indexchunk {chunk}") #suffixes = (f'_{index}', '')
+                print(f"merged_df_2 {merged_df_2}| df_temp {df_temp} ")
+                merged_df_2 = pd.merge(merged_df_2, df_temp, on=["Location", "Period", "Dimension"], how="outer") # suffixes=suffixes
 
     print(f"merged_df_2 {merged_df_2.columns}")
     print("################ Done appending type 2 dataframes. ################")
