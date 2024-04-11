@@ -9,8 +9,7 @@ spark = SparkSession.builder.appName("demo").config("spark.driver.memory", "8g")
 
 #####File Locations
 file_locations = [
-    "./data/combined_world_development.csv",
-    "./data/WHO_statistics/eliminateViolenceAgainstWomen.csv"
+    "./data/combined_world_development.csv"
 ]
 
 ## function to clean countries which are not in the European Union
